@@ -63,7 +63,7 @@ StatusOr<std::unique_ptr<PIRClient>> PIRClient::Create(
   ASSIGN_OR_RETURN(auto context, PIRContext::Create(params));
   auto client = absl::WrapUnique(new PIRClient(std::move(context)));
   RETURN_IF_ERROR(client->initialize());
-  return client;
+  return std::move(client);
 }
 
 StatusOr<uint64_t> InvertMod(uint64_t m, const seal::Modulus& mod) {
