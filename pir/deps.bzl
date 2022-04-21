@@ -65,7 +65,7 @@ def pir_deps():
     if "com_microsoft_seal" not in native.existing_rules():
         http_archive(
             name = "com_microsoft_seal",
-            build_file = "//third_party:seal.BUILD",
+            build_file = "@org_openmined_pir//third_party:seal.BUILD",
             sha256 = "13674a39a48c0d1c6ff544521cf10ee539ce1af75c02bfbe093f7621869e3406",
             strip_prefix = "SEAL-3.5.6",
             urls = ["https://github.com/microsoft/SEAL/archive/v3.5.6.tar.gz"],
