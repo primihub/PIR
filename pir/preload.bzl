@@ -31,9 +31,10 @@ def pir_preload():
         )
 
     if "rules_foreign_cc" not in native.existing_rules():
-        git_repository(
+        http_archive(
             name = "rules_foreign_cc",
-            remote = "https://github.com/bazelbuild/rules_foreign_cc",
-            init_submodules = True,
-            commit="d54c78ab86b40770ee19f0949db9d74a831ab9f0",
-            )
+            sha256 = "33a5690733c5cc2ede39cb62ebf89e751f2448e27f20c8b2fbbc7d136b166804",
+            strip_prefix = "rules_foreign_cc-0.5.1",
+            url = "https://github.com/bazelbuild/rules_foreign_cc/archive/0.5.1.tar.gz",
+        )
+
