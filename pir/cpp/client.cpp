@@ -176,6 +176,9 @@ StatusOr<std::vector<string>> PIRClient::ProcessResponse(
   for (size_t i = 0; i < indexes.size(); ++i) {
     ASSIGN_OR_RETURN(auto result_pt, ProcessReply(response_proto.reply(i)));
 
+    // Recover the omitted 0's at the end of the plaintext before decoding.
+    result_pt.resize(context_->EncryptionParams().poly_modulus_degree());
+
     ASSIGN_OR_RETURN(
         auto v, encoder.decode(result_pt, context_->Params()->bytes_per_item(),
                                db_->calculate_item_offset(indexes[i])));
