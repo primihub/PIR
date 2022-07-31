@@ -20,33 +20,33 @@
 #include "absl/strings/str_cat.h"
 #include "absl/types/span.h"
 
-#define ASSERT_OK(expr)                                           \
-  do {                                                            \
-    const Status _status = (expr);                                \
-    ASSERT_TRUE(_status.ok()) << "Error: " << _status.ToString(); \
-  } while (false)
+#define ASSERT_OK(expr)                                               \
+    do {                                                              \
+        const Status _status = (expr);                                \
+        ASSERT_TRUE(_status.ok()) << "Error: " << _status.ToString(); \
+    } while (false)
 
-#define EXPECT_OK(expr)                                           \
-  do {                                                            \
-    const Status _status = (expr);                                \
-    EXPECT_TRUE(_status.ok()) << "Error: " << _status.ToString(); \
-  } while (false)
+#define EXPECT_OK(expr)                                               \
+    do {                                                              \
+        const Status _status = (expr);                                \
+        EXPECT_TRUE(_status.ok()) << "Error: " << _status.ToString(); \
+    } while (false)
 
 #define ASSIGN_OR_FAIL(lhs, rexpr) \
-  ASSIGN_OR_FAIL_IMPL_(CONCAT_NAME_(status_or_, __LINE__), lhs, rexpr)
+    ASSIGN_OR_FAIL_IMPL_(CONCAT_NAME_(status_or_, __LINE__), lhs, rexpr)
 
 #define ASSIGN_OR_RETURN(lhs, rexpr) \
-  ASSIGN_OR_RETURN_IMPL_(CONCAT_NAME_(status_or_, __LINE__), lhs, rexpr)
+    ASSIGN_OR_RETURN_IMPL_(CONCAT_NAME_(status_or_, __LINE__), lhs, rexpr)
 
 #define CONCAT_NAME_INNER_(x, y) x##y
 #define CONCAT_NAME_(x, y) CONCAT_NAME_INNER_(x, y)
 
-#define ASSIGN_OR_FAIL_IMPL_(statusor, lhs, rexpr)                         \
-  auto statusor = (rexpr);                                                 \
-  ASSERT_TRUE(statusor.ok()) << "Error: " << statusor.status().ToString(); \
-  lhs = std::move(*statusor);
+#define ASSIGN_OR_FAIL_IMPL_(statusor, lhs, rexpr)                           \
+    auto statusor = (rexpr);                                                 \
+    ASSERT_TRUE(statusor.ok()) << "Error: " << statusor.status().ToString(); \
+    lhs = std::move(*statusor);
 
 #define ASSIGN_OR_RETURN_IMPL_(statusor, lhs, rexpr) \
-  auto statusor = (rexpr);                           \
-  if (!statusor.ok()) return statusor.status();      \
-  lhs = std::move(*statusor);
+    auto statusor = (rexpr);                         \
+    if (!statusor.ok()) return statusor.status();    \
+    lhs = std::move(*statusor);

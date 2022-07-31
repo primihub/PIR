@@ -45,66 +45,67 @@ using std::int64_t;
 using std::vector;
 
 TEST(PIRParametersTest, SanityCheck) {
-  // make sure we can actually initialize SEAL and that defaults are sane
-  ASSIGN_OR_FAIL(auto pir_params, CreatePIRParameters(1026, 256));
-  EXPECT_THAT(pir_params->num_items(), Eq(1026));
-  EXPECT_THAT(pir_params->num_pt(), Eq(27));
-  EXPECT_THAT(pir_params->bytes_per_item(), Eq(256));
-  EXPECT_THAT(pir_params->items_per_plaintext(), Eq(38));
-  EXPECT_THAT(pir_params->dimensions(), ElementsAre(27));
-  ASSIGN_OR_FAIL(auto encryptionParams,
-                 SEALDeserialize<EncryptionParameters>(
-                     pir_params->encryption_parameters()));
-  auto context = seal::SEALContext::Create(encryptionParams);
-  EXPECT_THAT(context->parameters_set(), IsTrue())
-      << "Error setting encryption parameters: "
-      << context->parameter_error_message();
+    // make sure we can actually initialize SEAL and that defaults are sane
+    ASSIGN_OR_FAIL(auto pir_params, CreatePIRParameters(1026, 256));
+    EXPECT_THAT(pir_params->num_items(), Eq(1026));
+    EXPECT_THAT(pir_params->num_pt(), Eq(27));
+    EXPECT_THAT(pir_params->bytes_per_item(), Eq(256));
+    EXPECT_THAT(pir_params->items_per_plaintext(), Eq(38));
+    EXPECT_THAT(pir_params->dimensions(), ElementsAre(27));
+    ASSIGN_OR_FAIL(auto encryptionParams,
+                   SEALDeserialize<EncryptionParameters>(
+                       pir_params->encryption_parameters()));
+    auto context = seal::SEALContext::Create(encryptionParams);
+    EXPECT_THAT(context->parameters_set(), IsTrue())
+        << "Error setting encryption parameters: "
+        << context->parameter_error_message();
 }
 
 TEST(PIRParametersTest, CreateMultiDim) {
-  ASSIGN_OR_FAIL(auto pir_params, CreatePIRParameters(19011, 500, 3));
-  EXPECT_THAT(pir_params->num_items(), Eq(19011));
-  EXPECT_THAT(pir_params->num_pt(), Eq(1001));
-  EXPECT_THAT(pir_params->bytes_per_item(), Eq(500));
-  EXPECT_THAT(pir_params->items_per_plaintext(), Eq(19));
-  EXPECT_THAT(pir_params->dimensions(), ElementsAre(11, 10, 10));
-  ASSIGN_OR_FAIL(auto encryption_params,
-                 SEALDeserialize<EncryptionParameters>(
-                     pir_params->encryption_parameters()));
-  auto context = seal::SEALContext::Create(encryption_params);
-  EXPECT_THAT(context->parameters_set(), IsTrue())
-      << "Error setting encryption parameters: "
-      << context->parameter_error_message();
+    ASSIGN_OR_FAIL(auto pir_params, CreatePIRParameters(19011, 500, 3));
+    EXPECT_THAT(pir_params->num_items(), Eq(19011));
+    EXPECT_THAT(pir_params->num_pt(), Eq(1001));
+    EXPECT_THAT(pir_params->bytes_per_item(), Eq(500));
+    EXPECT_THAT(pir_params->items_per_plaintext(), Eq(19));
+    EXPECT_THAT(pir_params->dimensions(), ElementsAre(11, 10, 10));
+    ASSIGN_OR_FAIL(auto encryption_params,
+                   SEALDeserialize<EncryptionParameters>(
+                       pir_params->encryption_parameters()));
+    auto context = seal::SEALContext::Create(encryption_params);
+    EXPECT_THAT(context->parameters_set(), IsTrue())
+        << "Error setting encryption parameters: "
+        << context->parameter_error_message();
 }
 
 TEST(PIRParametersTest, CreateAllParams) {
-  ASSIGN_OR_FAIL(auto pir_params,
-                 CreatePIRParameters(77412, 777, 2,
-                                     GenerateEncryptionParams(8192), true, 12));
-  EXPECT_THAT(pir_params->num_items(), Eq(77412));
-  EXPECT_THAT(pir_params->num_pt(), Eq(5161));
-  EXPECT_THAT(pir_params->bytes_per_item(), Eq(777));
-  EXPECT_THAT(pir_params->items_per_plaintext(), Eq(15));
-  EXPECT_THAT(pir_params->dimensions(), ElementsAre(72, 72));
-  EXPECT_THAT(pir_params->use_ciphertext_multiplication(), IsTrue());
-  EXPECT_THAT(pir_params->bits_per_coeff(), Eq(12));
-  ASSIGN_OR_FAIL(auto encryption_params,
-                 SEALDeserialize<EncryptionParameters>(
-                     pir_params->encryption_parameters()));
-  auto context = seal::SEALContext::Create(encryption_params);
-  EXPECT_THAT(context->parameters_set(), IsTrue())
-      << "Error setting encryption parameters: "
-      << context->parameter_error_message();
+    ASSIGN_OR_FAIL(
+        auto pir_params,
+        CreatePIRParameters(77412, 777, 2, GenerateEncryptionParams(8192), true,
+                            12));
+    EXPECT_THAT(pir_params->num_items(), Eq(77412));
+    EXPECT_THAT(pir_params->num_pt(), Eq(5161));
+    EXPECT_THAT(pir_params->bytes_per_item(), Eq(777));
+    EXPECT_THAT(pir_params->items_per_plaintext(), Eq(15));
+    EXPECT_THAT(pir_params->dimensions(), ElementsAre(72, 72));
+    EXPECT_THAT(pir_params->use_ciphertext_multiplication(), IsTrue());
+    EXPECT_THAT(pir_params->bits_per_coeff(), Eq(12));
+    ASSIGN_OR_FAIL(auto encryption_params,
+                   SEALDeserialize<EncryptionParameters>(
+                       pir_params->encryption_parameters()));
+    auto context = seal::SEALContext::Create(encryption_params);
+    EXPECT_THAT(context->parameters_set(), IsTrue())
+        << "Error setting encryption parameters: "
+        << context->parameter_error_message();
 }
 
 TEST(PIRParametersTest, EncryptionParamsSerialization) {
-  // use something other than defaults
-  auto params = GenerateEncryptionParams(8192);
-  std::string serial;
-  ASSERT_OK(SEALSerialize<EncryptionParameters>(params, &serial));
-  ASSIGN_OR_FAIL(auto new_params,
-                 SEALDeserialize<EncryptionParameters>(serial));
-  ASSERT_THAT(new_params, Eq(params));
+    // use something other than defaults
+    auto params = GenerateEncryptionParams(8192);
+    std::string serial;
+    ASSERT_OK(SEALSerialize<EncryptionParameters>(params, &serial));
+    ASSIGN_OR_FAIL(auto new_params,
+                   SEALDeserialize<EncryptionParameters>(serial));
+    ASSERT_THAT(new_params, Eq(params));
 }
 
 }  // namespace

@@ -32,44 +32,44 @@ using std::vector;
 StatusOr<vector<Ciphertext>> LoadCiphertexts(
     const std::shared_ptr<seal::SEALContext>& sealctx,
     const Ciphertexts& input) {
-  vector<Ciphertext> output(input.ct_size());
-  for (int idx = 0; idx < input.ct_size(); ++idx) {
-    ASSIGN_OR_RETURN(output[idx],
-                     SEALDeserialize<Ciphertext>(sealctx, input.ct(idx)));
-  }
+    vector<Ciphertext> output(input.ct_size());
+    for (int idx = 0; idx < input.ct_size(); ++idx) {
+        ASSIGN_OR_RETURN(output[idx],
+                         SEALDeserialize<Ciphertext>(sealctx, input.ct(idx)));
+    }
 
-  return output;
+    return output;
 }
 
 Status SaveCiphertexts(const vector<Ciphertext>& ciphertexts,
                        Ciphertexts* output) {
-  if (output == nullptr) {
-    return InvalidArgumentError("output nullptr");
-  }
+    if (output == nullptr) {
+        return InvalidArgumentError("output nullptr");
+    }
 
-  for (size_t idx = 0; idx < ciphertexts.size(); ++idx) {
-    RETURN_IF_ERROR(
-        SEALSerialize<Ciphertext>(ciphertexts[idx], output->add_ct()));
-  }
-  return absl::OkStatus();
+    for (size_t idx = 0; idx < ciphertexts.size(); ++idx) {
+        RETURN_IF_ERROR(
+            SEALSerialize<Ciphertext>(ciphertexts[idx], output->add_ct()));
+    }
+    return absl::OkStatus();
 }
 
 Status SaveRequest(const vector<vector<Ciphertext>>& cts, Request* request) {
-  for (const auto& ct : cts) {
-    RETURN_IF_ERROR(SaveCiphertexts(ct, request->add_query()));
-  }
-  return absl::OkStatus();
+    for (const auto& ct : cts) {
+        RETURN_IF_ERROR(SaveCiphertexts(ct, request->add_query()));
+    }
+    return absl::OkStatus();
 }
 
 Status SaveRequest(const vector<vector<Ciphertext>>& cts,
                    const seal::GaloisKeys& galois_keys,
                    const seal::RelinKeys& relin_keys, Request* request) {
-  RETURN_IF_ERROR(SaveRequest(cts, request));
-  RETURN_IF_ERROR(
-      SEALSerialize<GaloisKeys>(galois_keys, request->mutable_galois_keys()));
-  RETURN_IF_ERROR(
-      SEALSerialize<RelinKeys>(relin_keys, request->mutable_relin_keys()));
-  return absl::OkStatus();
+    RETURN_IF_ERROR(SaveRequest(cts, request));
+    RETURN_IF_ERROR(
+        SEALSerialize<GaloisKeys>(galois_keys, request->mutable_galois_keys()));
+    RETURN_IF_ERROR(
+        SEALSerialize<RelinKeys>(relin_keys, request->mutable_relin_keys()));
+    return absl::OkStatus();
 }
 
 };  // namespace pir

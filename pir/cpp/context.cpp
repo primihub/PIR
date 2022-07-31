@@ -30,23 +30,23 @@ PIRContext::PIRContext(shared_ptr<PIRParameters> params,
                        const EncryptionParameters& enc_params,
                        shared_ptr<seal::SEALContext> context)
     : parameters_(params), encryption_params_(enc_params), context_(context) {
-  encoder_ = std::make_shared<seal::IntegerEncoder>(this->context_);
-  evaluator_ = std::make_shared<seal::Evaluator>(context_);
+    encoder_ = std::make_shared<seal::IntegerEncoder>(this->context_);
+    evaluator_ = std::make_shared<seal::Evaluator>(context_);
 }
 
 StatusOr<std::unique_ptr<PIRContext>> PIRContext::Create(
     shared_ptr<PIRParameters> params) {
-  ASSIGN_OR_RETURN(auto enc_params, SEALDeserialize<EncryptionParameters>(
-                                        params->encryption_parameters()));
+    ASSIGN_OR_RETURN(auto enc_params, SEALDeserialize<EncryptionParameters>(
+                                          params->encryption_parameters()));
 
-  try {
-    auto context = seal::SEALContext::Create(enc_params);
-    return absl::WrapUnique(new PIRContext(params, enc_params, context));
-  } catch (const std::exception& e) {
-    return InvalidArgumentError(e.what());
-  }
+    try {
+        auto context = seal::SEALContext::Create(enc_params);
+        return absl::WrapUnique(new PIRContext(params, enc_params, context));
+    } catch (const std::exception& e) {
+        return InvalidArgumentError(e.what());
+    }
 
-  return InternalError("this should never happen");
+    return InternalError("this should never happen");
 }
 
 }  // namespace pir
