@@ -98,15 +98,23 @@ Status PIRDatabase::populate(const vector<string>& rawdb) {
         encoder->set_bits_per_coeff(context_->Params()->bits_per_coeff());
     }
     auto raw_it = rawdb.begin();
-    for (size_t i = 0; i < db_.size(); ++i) {
-        auto end_it = std::min(raw_it + items_per_pt, rawdb.end());
-        RETURN_IF_ERROR(encoder->encode(raw_it, end_it, db_[i]));
-        if (!context_->Params()->use_ciphertext_multiplication()) {
-            evaluator->transform_to_ntt_inplace(
-                db_[i], context_->SEALContext()->first_parms_id());
+    auto db_size = db_.size();
+    // std::cout << "db size = " << db_size << std::endl;
+    std::vector<Status> ret_status(db_size);
+    for (size_t i = 0; i < (db_size + 7999) / 8000; ++i) {
+        // std::cout << "i = " << i << std::endl;
+        for (size_t j = 0; j < std::min((size_t)8000, db_size - i * 8000); j++) {
+            // std::cout << "j = " << j << std::endl;
+            auto end_it = std::min(raw_it + items_per_pt, rawdb.end());
+            ret_status[i * 8000 + j] = encoder->encode(raw_it, end_it, db_[i * 8000 + j]);
+            if (!context_->Params()->use_ciphertext_multiplication()) {
+                evaluator->transform_to_ntt_inplace(
+                    db_[i * 8000 + j], context_->SEALContext()->first_parms_id());
+            }
+            raw_it += items_per_pt;
         }
-        raw_it += items_per_pt;
     }
+    for (const auto& status: ret_status) { if (!status.ok()) return status; }
     return absl::OkStatus();
 }
 
