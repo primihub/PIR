@@ -80,19 +80,19 @@ Status SaveRequest(const vector<vector<Ciphertext>>& cts,
  **/
 template <class T>
 Status SEALSerialize(const T& sealobj, string* output) {
-  if (output == nullptr) {
-    return InvalidArgumentError("output nullptr");
-  }
-  std::stringstream stream;
+    if (output == nullptr) {
+        return InvalidArgumentError("output nullptr");
+    }
+    std::stringstream stream;
 
-  try {
-    sealobj.save(stream);
-  } catch (const std::exception& e) {
-    return InternalError(e.what());
-  }
+    try {
+        sealobj.save(stream);
+    } catch (const std::exception& e) {
+        return InternalError(e.what());
+    }
 
-  *output = stream.str();
-  return absl::OkStatus();
+    *output = stream.str();
+    return absl::OkStatus();
 }
 
 /**
@@ -104,17 +104,17 @@ Status SEALSerialize(const T& sealobj, string* output) {
 template <class T>
 StatusOr<T> SEALDeserialize(const shared_ptr<SEALContext>& sealctx,
                             const string& in) {
-  T out;
+    T out;
 
-  try {
-    std::stringstream stream;
-    stream << in;
-    out.load(sealctx, stream);
-  } catch (const std::exception& e) {
-    return InvalidArgumentError(e.what());
-  }
+    try {
+        std::stringstream stream;
+        stream << in;
+        out.load(sealctx, stream);
+    } catch (const std::exception& e) {
+        return InvalidArgumentError(e.what());
+    }
 
-  return out;
+    return out;
 }
 
 /**
@@ -124,17 +124,17 @@ StatusOr<T> SEALDeserialize(const shared_ptr<SEALContext>& sealctx,
  **/
 template <class T>
 StatusOr<T> SEALDeserialize(const string& in) {
-  T out;
+    T out;
 
-  try {
-    std::stringstream stream;
-    stream << in;
-    out.load(stream);
-  } catch (const std::exception& e) {
-    return InvalidArgumentError(e.what());
-  }
+    try {
+        std::stringstream stream;
+        stream << in;
+        out.load(stream);
+    } catch (const std::exception& e) {
+        return InvalidArgumentError(e.what());
+    }
 
-  return out;
+    return out;
 }
 
 }  // namespace pir
