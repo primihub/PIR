@@ -31,33 +31,33 @@ using ::std::shared_ptr;
 using ::std::vector;
 
 class CiphertextReencoder {
-   public:
-    static StatusOr<std::unique_ptr<CiphertextReencoder>> Create(
-        shared_ptr<SEALContext> /*params*/);
+ public:
+  static StatusOr<std::unique_ptr<CiphertextReencoder>> Create(
+      shared_ptr<SEALContext> /*params*/);
 
-    uint32_t ExpansionRatio() const;
+  uint32_t ExpansionRatio() const;
 
-    /**
-     * Reencode a ciphertext as a set of plaintexts.
-     * @param[in] ct Ciphertext to reencode.
-     * @returns Vector of plaintexts created by decomposing CT.
-     */
-    vector<Plaintext> Encode(const Ciphertext& ct);
+  /**
+   * Reencode a ciphertext as a set of plaintexts.
+   * @param[in] ct Ciphertext to reencode.
+   * @returns Vector of plaintexts created by decomposing CT.
+   */
+  vector<Plaintext> Encode(const Ciphertext& ct);
 
-    /**
-     * Recompose a ciphertext from a set of plaintexts.
-     * @param[in] pts Vector of plaintexts to decode.
-     * @returns Ciphertext recomposed from plaintexts.
-     */
-    Ciphertext Decode(const vector<Plaintext>& pts);
+  /**
+   * Recompose a ciphertext from a set of plaintexts.
+   * @param[in] pts Vector of plaintexts to decode.
+   * @returns Ciphertext recomposed from plaintexts.
+   */
+  Ciphertext Decode(const vector<Plaintext>& pts);
 
-    Ciphertext Decode(vector<Plaintext>::const_iterator pt_iter,
-                      const size_t ct_poly_count);
+  Ciphertext Decode(vector<Plaintext>::const_iterator pt_iter,
+                    const size_t ct_poly_count);
 
-   private:
-    CiphertextReencoder(shared_ptr<SEALContext> context) : context_(context) {}
+ private:
+  CiphertextReencoder(shared_ptr<SEALContext> context) : context_(context) {}
 
-    shared_ptr<SEALContext> context_;
+  shared_ptr<SEALContext> context_;
 };
 
 }  // namespace pir

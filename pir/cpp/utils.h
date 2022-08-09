@@ -28,12 +28,12 @@ std::vector<uint32_t> generate_galois_elts(uint64_t N);
 // Utility function to find the next highest power of 2 of a given number.
 template <typename t>
 t next_power_two(t n) {
-    if (n == 0) return 1;
-    --n;
-    for (size_t i = 1; i < sizeof(n) * 8; i = i << 1) {
-        n |= n >> i;
-    }
-    return n + 1;
+  if (n == 0) return 1;
+  --n;
+  for (size_t i = 1; i < sizeof(n) * 8; i = i << 1) {
+    n |= n >> i;
+  }
+  return n + 1;
 }
 
 // Utility function to find the log base 2 of v rounded up.
@@ -44,16 +44,16 @@ uint32_t log2(uint32_t v);
 
 // Utility function to calculate integer power
 inline size_t ipow(size_t base, size_t exp) {
-    size_t result = 1;
-    for (;;) {
-        if (exp & 1) {
-            result *= base;
-        }
-        exp >>= 1;
-        if (!exp) break;
-        base *= base;
+  size_t result = 1;
+  for (;;) {
+    if (exp & 1) {
+      result *= base;
     }
-    return result;
+    exp >>= 1;
+    if (!exp) break;
+    base *= base;
+  }
+  return result;
 }
 
 }  // namespace pir
@@ -66,13 +66,12 @@ namespace private_join_and_compute {
 //
 // Example:
 //   RETURN_IF_ERROR(DoThings(4));
-#define RETURN_IF_ERROR(expr)                                                 \
-    do {                                                                      \
-        /* Using _status below to avoid capture problems if expr is "status". \
-         */                                                                   \
-        const Status _status = (expr);                                        \
-        if (!_status.ok()) return _status;                                    \
-    } while (0)
+#define RETURN_IF_ERROR(expr)                                                \
+  do {                                                                       \
+    /* Using _status below to avoid capture problems if expr is "status". */ \
+    const Status _status = (expr);                                           \
+    if (!_status.ok()) return _status;                                       \
+  } while (0)
 
 }  // namespace private_join_and_compute
 

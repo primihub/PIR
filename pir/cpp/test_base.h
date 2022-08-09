@@ -42,33 +42,33 @@ vector<string> generate_test_db(size_t db_size, size_t elem_size,
                                 uint64_t seed = 42);
 
 class PIRTestingBase {
-   public:
-    PIRTestingBase() {}
-    virtual ~PIRTestingBase() {}
+ public:
+  PIRTestingBase() {}
+  virtual ~PIRTestingBase() {}
 
-   protected:
-    // Generate the EncryptParameters and PIRParameters and validate them.
-    void SetUpParams(size_t db_size, size_t elem_size, size_t dimensions = 1,
-                     uint32_t poly_modulus_degree = POLY_MODULUS_DEGREE,
-                     uint32_t plain_mod_bit_size = 20,
-                     uint32_t bits_per_coeff = 0,
-                     bool use_ciphertext_multiplication = false);
+ protected:
+  // Generate the EncryptParameters and PIRParameters and validate them.
+  void SetUpParams(size_t db_size, size_t elem_size, size_t dimensions = 1,
+                   uint32_t poly_modulus_degree = POLY_MODULUS_DEGREE,
+                   uint32_t plain_mod_bit_size = 20,
+                   uint32_t bits_per_coeff = 0,
+                   bool use_ciphertext_multiplication = false);
 
-    // Genrate a DB of random values
-    void GenerateDB(uint32_t seed = 42);
-    void GenerateIntDB(uint32_t seed = 42);
+  // Genrate a DB of random values
+  void GenerateDB(uint32_t seed = 42);
+  void GenerateIntDB(uint32_t seed = 42);
 
-    void SetUpSealTools();
+  void SetUpSealTools();
 
-    size_t db_size_;
-    vector<string> string_db_;
-    vector<int64_t> int_db_;
-    shared_ptr<SEALContext> seal_context_;
-    shared_ptr<PIRParameters> pir_params_;
-    shared_ptr<PIRDatabase> pir_db_;
-    unique_ptr<KeyGenerator> keygen_;
-    unique_ptr<Encryptor> encryptor_;
-    unique_ptr<Decryptor> decryptor_;
+  size_t db_size_;
+  vector<string> string_db_;
+  vector<int64_t> int_db_;
+  shared_ptr<SEALContext> seal_context_;
+  shared_ptr<PIRParameters> pir_params_;
+  shared_ptr<PIRDatabase> pir_db_;
+  unique_ptr<KeyGenerator> keygen_;
+  unique_ptr<Encryptor> encryptor_;
+  unique_ptr<Decryptor> decryptor_;
 };
 }  // namespace pir
 

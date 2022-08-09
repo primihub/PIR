@@ -55,41 +55,41 @@ class PIRCorrectnessTest
           tuple<bool, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t,
                 uint32_t, vector<size_t>>>,
       public PIRTestingBase {
-   protected:
-    void SetUp() {
-        const auto use_ciphertext_multiplication = get<0>(GetParam());
-        const auto poly_modulus_degree = get<1>(GetParam());
-        const auto plain_mod_bits = get<2>(GetParam());
-        const auto elem_size = get<3>(GetParam());
-        const auto bits_per_coeff = get<4>(GetParam());
-        const auto dbsize = get<5>(GetParam());
-        const auto d = get<6>(GetParam());
+ protected:
+  void SetUp() {
+    const auto use_ciphertext_multiplication = get<0>(GetParam());
+    const auto poly_modulus_degree = get<1>(GetParam());
+    const auto plain_mod_bits = get<2>(GetParam());
+    const auto elem_size = get<3>(GetParam());
+    const auto bits_per_coeff = get<4>(GetParam());
+    const auto dbsize = get<5>(GetParam());
+    const auto d = get<6>(GetParam());
 
-        SetUpParams(dbsize, elem_size, d, poly_modulus_degree, plain_mod_bits,
-                    bits_per_coeff, use_ciphertext_multiplication);
-        GenerateDB();
+    SetUpParams(dbsize, elem_size, d, poly_modulus_degree, plain_mod_bits,
+                bits_per_coeff, use_ciphertext_multiplication);
+    GenerateDB();
 
-        client_ = *(PIRClient::Create(pir_params_));
-        server_ = *(PIRServer::Create(pir_db_, pir_params_));
-        ASSERT_THAT(client_, NotNull());
-        ASSERT_THAT(server_, NotNull());
-    }
+    client_ = *(PIRClient::Create(pir_params_));
+    server_ = *(PIRServer::Create(pir_db_, pir_params_));
+    ASSERT_THAT(client_, NotNull());
+    ASSERT_THAT(server_, NotNull());
+  }
 
-    unique_ptr<PIRClient> client_;
-    unique_ptr<PIRServer> server_;
+  unique_ptr<PIRClient> client_;
+  unique_ptr<PIRServer> server_;
 };
 
 TEST_P(PIRCorrectnessTest, TestCorrectness) {
-    const auto desired_indices = get<7>(GetParam());
-    ASSIGN_OR_FAIL(auto request, client_->CreateRequest(desired_indices));
-    ASSIGN_OR_FAIL(auto response, server_->ProcessRequest(request));
-    ASSIGN_OR_FAIL(auto results,
-                   client_->ProcessResponse(desired_indices, response));
+  const auto desired_indices = get<7>(GetParam());
+  ASSIGN_OR_FAIL(auto request, client_->CreateRequest(desired_indices));
+  ASSIGN_OR_FAIL(auto response, server_->ProcessRequest(request));
+  ASSIGN_OR_FAIL(auto results,
+                 client_->ProcessResponse(desired_indices, response));
 
-    ASSERT_EQ(results.size(), desired_indices.size());
-    for (size_t i = 0; i < results.size(); ++i) {
-        ASSERT_EQ(results[i], string_db_[desired_indices[i]]) << "i = " << i;
-    }
+  ASSERT_EQ(results.size(), desired_indices.size());
+  for (size_t i = 0; i < results.size(); ++i) {
+    ASSERT_EQ(results[i], string_db_[desired_indices[i]]) << "i = " << i;
+  }
 }
 
 INSTANTIATE_TEST_SUITE_P(
