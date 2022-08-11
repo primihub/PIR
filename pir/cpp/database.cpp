@@ -97,24 +97,57 @@ Status PIRDatabase::populate(const vector<string>& rawdb) {
     if (context_->Params()->bits_per_coeff() > 0) {
         encoder->set_bits_per_coeff(context_->Params()->bits_per_coeff());
     }
-    auto raw_it = rawdb.begin();
+    const size_t ITEMS_PER_THREAD = 8000 / items_per_pt * items_per_pt;
+    auto rawdb_it = rawdb.begin();
+    auto rawdb_end = rawdb.end();
     auto db_size = db_.size();
-    // std::cout << "db size = " << db_size << std::endl;
-    std::vector<Status> ret_status(db_size);
-    for (size_t i = 0; i < (db_size + 7999) / 8000; ++i) {
-        // std::cout << "i = " << i << std::endl;
-        for (size_t j = 0; j < std::min((size_t)8000, db_size - i * 8000); j++) {
-            // std::cout << "j = " << j << std::endl;
-            auto end_it = std::min(raw_it + items_per_pt, rawdb.end());
-            ret_status[i * 8000 + j] = encoder->encode(raw_it, end_it, db_[i * 8000 + j]);
-            if (!context_->Params()->use_ciphertext_multiplication()) {
-                evaluator->transform_to_ntt_inplace(
-                    db_[i * 8000 + j], context_->SEALContext()->first_parms_id());
-            }
-            raw_it += items_per_pt;
-        }
+    const auto use_ctxt_mul = context_->Params()->use_ciphertext_multiplication();
+    const auto first_parms_id = context_->SEALContext()->first_parms_id();
+    std::vector<std::vector<Status>> ret_status((db_size + ITEMS_PER_THREAD - 1) / ITEMS_PER_THREAD);
+    std::vector<std::thread> thrds;
+    // for (size_t i = 0; i < (db_size + ITEMS_PER_THREAD - 1) / ITEMS_PER_THREAD; ++i) {
+    //     // std::cout << "i = " << i << std::endl;
+    //     for (size_t j = 0; j < std::min(ITEMS_PER_THREAD, db_size - i * ITEMS_PER_THREAD); j++) {
+    //         // std::cout << "j = " << j << std::endl;
+    //         auto end_it = std::min(rawdb_it + items_per_pt, rawdb_end);
+    //         ret_status[i].push_back(encoder->encode(rawdb_it, end_it, db_[i * ITEMS_PER_THREAD + j]));
+    //         if (!use_ctxt_mul) {
+    //             evaluator->transform_to_ntt_inplace(
+    //                 db_[i * ITEMS_PER_THREAD + j], first_parms_id);
+    //         }
+    //         rawdb_it += items_per_pt;
+    //     }
+    // }
+
+    for (size_t i = 0; i < (db_size + ITEMS_PER_THREAD - 1) / ITEMS_PER_THREAD; ++i) {
+        thrds.emplace_back(std::thread(
+            [=, &encoder, &evaluator](size_t seg,
+                                      std::vector<std::string>::const_iterator curr_begin_it, 
+                                      std::vector<Status> &curr_ret_status) {
+                for (size_t j = 0; j < std::min(ITEMS_PER_THREAD, db_size - seg * ITEMS_PER_THREAD); j++) {
+                    auto end_it = std::min(curr_begin_it + items_per_pt, rawdb_end);
+                    curr_ret_status.push_back(encoder->encode(curr_begin_it, end_it, db_[seg * ITEMS_PER_THREAD + j]));
+                    if (!use_ctxt_mul) {
+                        evaluator->transform_to_ntt_inplace(
+                            db_[seg * ITEMS_PER_THREAD + j], first_parms_id);
+                    }
+                    curr_begin_it += items_per_pt;
+                }
+            },
+            i,
+            rawdb_it,
+            std::ref(ret_status[i])
+            ));
+        rawdb_it += items_per_pt * ITEMS_PER_THREAD;
     }
-    for (const auto& status: ret_status) { if (!status.ok()) return status; }
+    for (auto &t: thrds) {
+        t.join();
+    }
+    for (const auto& status_vec: ret_status) { 
+        for (const auto& status: status_vec) 
+            if (!status.ok()) 
+                return status; 
+    }
     return absl::OkStatus();
 }
 
